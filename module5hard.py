@@ -14,10 +14,15 @@ class Video:
         self.duration = duration
         self.adult_mode = adult_mode
         self.time_now = 0
+        return
 
 
 class UrTube:
     def __init__(self):
+
+        self.age = None
+        self.password = None
+        self.nickname = None
         self.users = []
         self.videos = []
         self.current_user = None
@@ -33,18 +38,19 @@ class UrTube:
                 print(f"Пользователь {nickname} уже существует")
                 break
         else:
-            self.nicname = nickname
+            self.nickname = nickname
             self.password = hash(password)
             self.age = age
             self.users.append([nickname, hash(password), age])
             self.current_user = nickname
+            return
 
     def log_out(self):
         self.current_user = None
 
     def add(self, *args):
         for arg in args:
-            self.videos.append([arg.title, arg.duration])
+            self.videos.append([arg.title, arg.duration, arg.adult_mode])
 
     def get_videos(self, key_word):
         sort_ = []
@@ -55,21 +61,32 @@ class UrTube:
         return sort_
 
     def watch_video(self, title):
-        for video in range(len(self.videos)):
-            if self.videos[video][0] != title:
-                break
 
-        if self.current_user == None:
+        if self.current_user is None:
             print('Войдите в аккаунт, чтобы смотреть видео')
-        elif self.age < 18:
-            print('Вам нет 18 лет, пожалуйста покиньте страницу')
-        else:
-            for video in range(len(self.videos)):
-                if self.videos[video][0] == title:
-                    for sek in range(1, self.videos[video][1] + 1):
-                        time.sleep(1)
-                        print(sek, end = ' ')
-                    print('Конец видео')
+
+        for video in range(len(self.videos)):
+            if self.videos[video][2] == True and self.videos[video][0] == title:
+                for user in range(len(self.users)):
+                    if self.users[user][0] == self.current_user and self.users[user][2] < 18:
+                        print('Вам нет 18 лет, пожалуйста покиньте страницу')
+
+        for video in range(len(self.videos)):
+            if self.videos[video][2] == True and self.videos[video][0] == title:
+                for user in range(len(self.users)):
+                    if self.users[user][0] == self.current_user and self.users[user][2] >= 18:
+                        for sek in range(1, self.videos[video][1] + 1):
+                            time.sleep(1)
+                            print(sek, end=' ')
+                        print('Конец видео')
+
+            elif self.videos[video][2] == False and self.videos[video][0] == title:
+                for user in range(len(self.users)):
+                    if self.users[user][0] == self.current_user:
+                        for sek in range(1, self.videos[video][1] + 1):
+                            time.sleep(1)
+                            print(sek, end=' ')
+                        print('Конец видео')
 
 
 ur = UrTube()
